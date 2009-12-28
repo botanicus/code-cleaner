@@ -2,10 +2,14 @@
 
 require "fileutils"
 
+# thor hooks:whitespace:install
+# thor hooks:whitespace:install --force
 module Hooks
   class Whitespace < Thor
+    method_options :force => :boolean
     desc "install", "Install hook for automatically removing trailing whitespace"
     def install
+      FileUtils.rm ".git/hooks/pre-commit" if options[:force]
       if File.exist?(".git/hooks/pre-commit")
         abort "You must remove .git/hooks/pre-commit first!"
       else
