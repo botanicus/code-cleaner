@@ -25,24 +25,26 @@ function abort() {
 # more portable, each echo implementation has quite different behaviour
 if which code-cleaner &> /dev/null; then
   for file in $files; do
-    if code-cleaner "$file" --try-apply-rules &> /dev/null ; then
-      printf "Normalizing \"\e[36m$file\e[0m\" "
-      code-cleaner "$file" --apply-rules &> /dev/null
-      # NOTE: we have to check the exit status directly,
-      # so we can be sure that the command just wasn't found
-      if [ $? -eq 10 ]; then # code-cleaner exits with 0 if some changes were made
-        printf "[\e[32mCLEAN\e[0m]\n"
-      elif [ $? -eq 1 ]; then # something goes wrong
-        printf "[\e[31mERROR\e[0m]\n"
-        code-cleaner "$file" --apply-rules
-      elif [ $? -eq 0 ] ; then
-        printf "[\e[33mDONE\e[0m]\n"
-        git add "$file" # so the changes will be committed immediately
+    if test -f "$file" ; then # ignore files which was removed by git rm
+      if code-cleaner "$file" --try-apply-rules &> /dev/null ; then
+        printf "Normalizing \"\e[36m$file\e[0m\" "
+        code-cleaner "$file" --apply-rules &> /dev/null
+        # NOTE: we have to check the exit status directly,
+        # so we can be sure that the command just wasn't found
+        if [ $? -eq 10 ]; then # code-cleaner exits with 0 if some changes were made
+          printf "[\e[32mCLEAN\e[0m]\n"
+        elif [ $? -eq 1 ]; then # something goes wrong
+          printf "[\e[31mERROR\e[0m]\n"
+          code-cleaner "$file" --apply-rules
+        elif [ $? -eq 0 ] ; then
+          printf "[\e[33mDONE\e[0m]\n"
+          git add "$file" # so the changes will be committed immediately
+        else
+          abort "Unexpected exit status $?"
+        fi
       else
-        abort "Unexpected exit status $?"
+        printf "Skipping \"\e[36m$file\e[0m\"\n"
       fi
-    else
-      printf "Skipping \"\e[36m$file\e[0m\"\n"
     fi
   done
 else
