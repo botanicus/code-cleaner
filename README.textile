@@ -1,0 +1,61 @@
+h1. About
+
+Remove trailing whitespace, append missing \n and replace tabs by two spaces.
+
+h1. Usage
+
+<pre>
+# edit script.rb and all Ruby scripts in lib directory
+code-cleaner script.rb lib
+
+# normalize standard input and print output to standard output
+cat script.rb | code-cleaner
+</pre>
+
+h2. Blacklisting & Whitelisting
+
+Of course you don't want to remove spaces from other files like PDF documents, images etc. You don't even want to remove spaces from all Ruby scripts, you probably want to ignore vendored files and locally installed gems. And this is where blacklisting and whitelisting comes handy.
+
+Default behaviour is to ignore everything from vendor and gems directories and from other directories just files ending with .rb, .rake, .task and .thor are normalized.
+
+You can change this behaviour by setting environment variables @BLACKLIST@ and @WHITELIST@. What you pass to these variables will be treated as a regular expression. The default behaviour respond to @BLACKLIST='/(vendor|gems)/'@ and @WHITELIST='\.(rb|rake|task|thor)$'@. Here's an example how you can use it:
+
+<pre>
+WHITELIST=''\.(rb|rake|nake|thor|task)$'' BLACKLIST='/(vendor|gems)/' code-cleaner .
+</pre>
+
+Note that these rules aren't applied for explicit arguments, so if you run @code-cleaner README.textile@, your readme actually will be normalized. It's because blacklisting and whitelisting rules are applied just on directories, so if you run @code-cleaner .@, your readme will stay untouched. Because of this reason @code-cleaner .@ and @code-cleaner *@ will be different.
+
+If you want to force blacklisting resp. whitelisting even for explicitly specified files, use @--apply-rules@ switch.
+
+In your Ruby projects, you might add all files in your @bin@ and @script@ directories into whitelist: @WHITELIST='(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'@
+
+h2. Exit statuses
+
+If code-cleaner does any changes, the exit status will be 0, otherwise it will be 10. It means you can use it in commands like:
+
+<pre>
+if code-cleaner "$file" --apply-rules; then # code-cleaner exits with 0 if some changes were made
+  git add "$file" # so the changes will be committed immediately
+fi
+</pre>
+
+Or, better and more safe way is to directly check exit status of last command via @$?@ as is used in the default @pre-commit@ hook:
+
+<pre>
+code-cleaner .
+
+if [ $? -eq 10 ]; then
+  echo Any modifications were made
+else
+  echo File was changed
+fi
+</pre>
+
+h2. Pre-commit hook
+
+The best way how you can ensure your sources are clean is to use pre-commit hook, if your SCM provides this function. Plus, if you are using git, just use @load "code-cleaner.rake"@ in your Rakefile and then run @rake hooks:whitespace:install@. There are also alternatives for "Nake":http://github.com/botanicus/nake (@code-cleaner.nake@) and "Thor":http://github.com/wycats/thor (@code-cleaner.thor@). Second way is to use @rake --rakefile /path/to/code-cleaner/tasks/code-cleaner.rake hooks:whitespace:install@ resp. @nake /path/to/code-cleaner/tasks/code-cleaner.nake hooks:whitespace:install@ directly.
+
+It might force you to remove your @.git/hooks/pre-commit@ if this file exist. If you haven't done any editation in this file, it's safe to do so and if you done some, then you will need to merge your changes manually.
+
+If you project run in bundled environment, make sure you have your @bin@ or @script@ directory in your @$PATH@ or change the pre-commit hook to point to the right path to the @code-cleaner@.

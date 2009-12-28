@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby -i
+
+# This is black magic!
+# If you like Perl, you will probably enjoy it
+# However it's easy to write and it works, so why not.
+
+# Also be warned this script is evil – it might eat your
+# cat or burn you house and I'm not responsible for it.
+
+# == Normalize your source code == #
+# 1) replace tabs by two space
+# 2) remove trailing whitespace
+# 3) add \n at the end of file unless it's already there
+
+# == Usage == #
+# code-cleaner app/controller/application_controller.rb
+# cat app/controller/application_controller.rb | code-cleaner
+#
+# == Implementation == #
+# The point is that ruby with -i will edit files
+
+require "find"
+
+WHITELIST = Regexp.new(ENV["WHITELIST"] || '\.(rb|rake|nake|thor|task)$')
+BLACKLIST = Regexp.new(ENV["BLACKLIST"] || '/(vendor|gems)/')
+
+def permitted?(file)
+  WHITELIST.match(file) && ! BLACKLIST.match(file)
+end
+
+if ARGF.nil?
+  abort "Hey mate, what about some arguments or piped data? How the fuck you think I work?!"
+end
+
+# help
+if ARGV.include?("-h") or ARGV.include?("--help")
+  abort "=== Usage ===\n"\
+        "#$0 script.rb"
+end
+
+if ARGV.delete("--apply-rules")
+  ARGV.delete_if { |file| File.file?(file) && ! permitted?(file) }
+end
+
+# expand all directories to list of files
+if ARGV.any? { |file| File.directory?(file) }
+  args = Array.new
+  ARGV.each do |item|
+    if File.directory?(item)
+      Find.find(item) do |file|
+        if File.file?(file) && permitted?(file)
+          args.push(file)
+        end
+      end
+    else
+      args.push(item)
+    end
+  end
+  ARGV.clear.push(*args)
+  puts "~ Expanding args into #{ARGV.inspect}"
+end
+
+# Ruby 1.9 will warn that you can't do in place edit for stdio,
+# so we will disable in place mode. Yes, in Ruby 1.9 you can finally
+# turn in place mode on or off from API in better way than just $-i = false.
+if ARGF.respond_to?(:inplace_mode) && ARGV.empty?
+  ARGF.inplace_mode = false
+end
+
+# default exit status is 10 which signalize that we actually haven't changed anything
+status = 10
+
+ARGF.each_line do |line|
+  # You might be wondering WTF is going on, I'm editing files, so I have to use File.open, do the modification on the original content and then save it. The point is we used -i switch which is good for in place editing
+   # flag that we actually changed the file
+  status = 0 if line.match(/^\s*\t\s*/) || ! line.match(/\n/)
+  puts line.gsub(/\t/, "  ").rstrip
+end
+
+exit status
