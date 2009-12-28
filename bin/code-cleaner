@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby -i
+# encoding: utf-8
 
 # This is black magic!
 # If you like Perl, you will probably enjoy it
@@ -21,7 +22,7 @@
 
 require "find"
 
-$-i = true # Windows compatibility
+$-i = "" # Windows compatibility
 
 WHITELIST = Regexp.new(ENV["WHITELIST"] || '\.(rb|rake|nake|thor|task)$')
 BLACKLIST = Regexp.new(ENV["BLACKLIST"] || '/(vendor|gems)/')
@@ -36,12 +37,37 @@ end
 
 # help
 if ARGV.include?("-h") or ARGV.include?("--help")
-  abort "=== Usage ===\n"\
-        "#$0 script.rb"
+  abort "[\e[32mUsage\e[0m]\n"\
+        "code-cleaner script.rb       # normalize script.rb\n"\
+        "cat script.rb | code-cleaner # normalize standard input and print output to standard output\n"\
+        "\n"\
+        "[\e[32mOptions\e[0m]\n"\
+        "--encoding=utf-8             # add encoding declaration if missing\n"\
+        "--apply-rules                # apply blacklisting and whitelisting even on explicitly specified files\n"\
+        "\n"\
+        "[\e[32mEnvironment Variables\e[0m]\n"\
+        "BLACKLIST                    # patterns which will be ignored, defaults to /(vendor|gems)/\n"\
+        "WHITELIST                    # patterns which won't be ignored, defaults to \.(rb|rake|nake|thor|task)$\n"\
+        "\n"\
+        "[\e[32mTricks\e[0m]\n"\
+        "If you want to add files from your bin or script directory into \n"\
+        "whitelist, use WHITELIST='(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'"
+        "\n"\
+        "[\e[32mExamples\e[0m]\n"\
+        "WHITELIST='(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'"
 end
 
 if ARGV.delete("--apply-rules")
   ARGV.delete_if { |file| File.file?(file) && ! permitted?(file) }
+end
+
+unless ARGV.grep(/^--encoding=(.+)$/).empty?
+  argument = ARGV.grep(/^--encoding=(.+)$/).first
+  ARGV.delete(argument)
+  argument.match(/^--encoding=(.+)$/)
+  encoding = $1.dup
+else
+  encoding = nil
 end
 
 # expand all directories to list of files
@@ -72,7 +98,18 @@ end
 # default exit status is 10 which signalize that we actually haven't changed anything
 status = 10
 
-ARGF.each_line do |line|
+while line = ARGF.gets
+  # I was trying to use ARGF.lineno.eql?(1), but it doesn't work. First problem
+  # was it didn't work with ARGF#each_line because IO#lineno count how many times
+  # IO#gets was called rather than how many \n the stream have. It isn't any
+  # serious problem, however when we have multiple files in ARGV, then the
+  # lineno isn't cleaned after the file in ARGF is switched.
+  # The trick with line.length == ARGF.pos is simple, IO#pos returns position
+  # of last character which was readed by gets or similar method, so if
+  # the position is same as is the line, then it has to be the first line.
+  if line.length == ARGF.pos && encoding && ! line.match(/^#.*coding/)
+    puts "# encoding: #{encoding}"
+  end
   # You might be wondering WTF is going on, I'm editing files, so I have to use File.open, do the modification on the original content and then save it. The point is we used -i switch which is good for in place editing
    # flag that we actually changed the file
   status = 0 if line.match(/^\s*\t\s*/) || ! line.match(/\n/)

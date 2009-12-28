@@ -10,6 +10,9 @@ code-cleaner script.rb lib
 
 # normalize standard input and print output to standard output
 cat script.rb | code-cleaner
+
+# add encoding declaration if missing
+code-cleaner --encoding=utf-8
 </pre>
 
 h2. Blacklisting & Whitelisting
