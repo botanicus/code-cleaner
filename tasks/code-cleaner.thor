@@ -10,7 +10,11 @@ module Hooks
     method_options :force => :boolean, :path => :string
     desc "install", "Install hook for automatically removing trailing whitespace"
     def install
-      FileUtils.rm ".git/hooks/pre-commit" if options[:force]
+      # --force
+      if File.exist?(".git/hooks/pre-commit") && options[:force]
+        FileUtils.rm ".git/hooks/pre-commit"
+      end
+
       if File.exist?(".git/hooks/pre-commit")
         abort "You must remove .git/hooks/pre-commit first!"
       else
