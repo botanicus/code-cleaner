@@ -44,6 +44,7 @@ if ARGV.include?("-h") or ARGV.include?("--help")
         "[\e[32mOptions\e[0m]\n"\
         "--encoding=utf-8             # add encoding declaration if missing\n"\
         "--apply-rules                # apply blacklisting and whitelisting even on explicitly specified files\n"\
+        "--try-apply-rules            # apply rules and exit successfuly if some files left in ARGV, fail otherwise\n"\
         "\n"\
         "[\e[32mEnvironment Variables\e[0m]\n"\
         "BLACKLIST                    # patterns which will be ignored, defaults to /(vendor|gems)/\n"\
@@ -57,10 +58,18 @@ if ARGV.include?("-h") or ARGV.include?("--help")
         "WHITELIST='(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'"
 end
 
-if ARGV.delete("--apply-rules")
+def apply_rules
   original = ARGV.dup
   ARGV.delete_if { |file| File.file?(file) && ! permitted?(file) }
   puts "~ Skipping #{original - ARGV}" unless ARGV == original
+end
+
+if ARGV.delete("--try-apply-rules")
+  apply_rules ? exit : exit 1
+end
+
+if ARGV.delete("--apply-rules")
+  apply_rules
 end
 
 unless ARGV.grep(/^--encoding=(.+)$/).empty?

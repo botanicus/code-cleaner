@@ -15,14 +15,18 @@ files=$(git diff --staged --name-only 2> /dev/null || echo ".")
 # NOTE: we are using printf rather than echo because printf should be
 # more portable, each echo implementation has quite different behaviour
 for file in $files; do
-  printf "Normalizing \"\e[36m$file\e[0m\" "
-  code-cleaner "$file" --apply-rules &> /dev/null
-  # NOTE: we have to check the exit status directly,
-  # so we can be sure that the command just wasn't found
-  if [ $? -eq 10 ]; then # code-cleaner exits with 0 if some changes were made
-    printf "[\e[32mCLEAN\e[0m]\n"
+  if code-cleaner "$file" --try-apply-rules &> /dev/null ; then
+    printf "Normalizing \"\e[36m$file\e[0m\" "
+    code-cleaner "$file" --apply-rules &> /dev/null
+    # NOTE: we have to check the exit status directly,
+    # so we can be sure that the command just wasn't found
+    if [ $? -eq 10 ]; then # code-cleaner exits with 0 if some changes were made
+      printf "[\e[32mCLEAN\e[0m]\n"
+    else
+      printf "[\e[33mDONE\e[0m]\n"
+      git add "$file" # so the changes will be committed immediately
+    fi
   else
-    printf "[\e[33mDONE\e[0m]\n"
-    git add "$file" # so the changes will be committed immediately
+    printf "Skipping \"\e[36m$file\e[0m\" "
   fi
 done

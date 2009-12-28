@@ -29,7 +29,7 @@ WHITELIST=''\.(rb|rake|nake|thor|task)$'' BLACKLIST='/(vendor|gems)/' code-clean
 
 Note that these rules aren't applied for explicit arguments, so if you run @code-cleaner README.textile@, your readme actually will be normalized. It's because blacklisting and whitelisting rules are applied just on directories, so if you run @code-cleaner .@, your readme will stay untouched. Because of this reason @code-cleaner .@ and @code-cleaner *@ will be different.
 
-If you want to force blacklisting resp. whitelisting even for explicitly specified files, use @--apply-rules@ switch.
+If you want to force blacklisting resp. whitelisting even for explicitly specified files, use @--apply-rules@ switch. If you want just try it, use @--try-apply-rules@ which will tell you which files will be skipped and exit without any editing. If some files left in ARGV, the exit status will be 0, otherwise it will be 1.
 
 In your Ruby projects, you might add all files in your @bin@ and @script@ directories into whitelist: @WHITELIST='(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'@
 
