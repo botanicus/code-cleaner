@@ -1,10 +1,12 @@
 # encoding: utf-8
 
+require "erb"
 require "fileutils"
 require "nake/task"
 
 # nake hooks:whitespace:install
 # nake hooks:whitespace:install --force
+# nake hooks:whitespace:install --path=script
 Nake::Task.new("hooks:whitespace:install") do |task|
   task.description = "Install hook for automatically removing trailing whitespace"
   task.define do |options = Hash.new|
@@ -14,8 +16,11 @@ Nake::Task.new("hooks:whitespace:install") do |task|
     else
       begin
         puts "Installing .git/hooks/pre-commit ..."
-        source = File.join(File.dirname(__FILE__), "..", "support", "pre-commit")
-        FileUtils.install source, ".git/hooks/pre-commit", :mode => 0755
+        source = File.join(File.dirname(__FILE__), "..", "support", "pre-commit.erb")
+        File.open(".git/hooks/pre-commit", "w") do |file|
+          file.puts(ERB.new(File.read(source)).result(binding))
+        end
+        File.chmod(0755, ".git/hooks/pre-commit")
       rescue Errno::ENOENT
         abort "You have to run git init first!"
       end

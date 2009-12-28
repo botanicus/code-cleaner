@@ -2,6 +2,10 @@
 
 echo "Entering pre-commit hook ..."
 
+# The code-cleaner script has to be in your $PATH. Uncomment
+# the following line if you have code-cleaner installed locally
+<% if options[:path].nil? %>#<% end %>export PATH="<%= options[:path] || "script" %>:$PATH"
+
 # If you haven't done any commit yet,
 # git diff will fail with following message:
 # fatal: No HEAD commit to compare with (yet)
@@ -42,5 +46,5 @@ if which code-cleaner &> /dev/null; then
     fi
   done
 else
-  abort "You have to install code-cleaner first!"
+  abort "You have to have code-cleaner installed and the code-cleaner script has to be in your \$PATH ($PATH)"
 fi

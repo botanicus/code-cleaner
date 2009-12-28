@@ -61,4 +61,23 @@ The best way how you can ensure your sources are clean is to use pre-commit hook
 
 It might force you to remove your @.git/hooks/pre-commit@ if this file exist. If you haven't done any editation in this file, it's safe to do so and if you done some, then you will need to merge your changes manually.
 
+<pre>
+begin
+  load "code-cleaner.nake"
+rescue LoadError
+  warn "If you want to contribute to nake, you have to install code-cleaner gem and then run ./tasks.rb hooks:
+end
+</pre>
+
 If you project run in bundled environment, make sure you have your @bin@ or @script@ directory in your @$PATH@ or change the pre-commit hook to point to the right path to the @code-cleaner@.
+
+<pre>
+load "code-cleaner.nake"
+Task["hooks:whitespace:install"].define do
+  content = File.readlines(".git/hooks/pre-commit")
+  content.insert(1, %{export PATH="script:$PATH"})
+  File.open(".git/hooks/pre-commit", "w") do |file|
+    file.puts(content)
+  end
+end
+</pre>
