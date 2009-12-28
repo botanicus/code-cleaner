@@ -114,7 +114,7 @@ status = 10
 # NOTE: if this shows as a bad idea, another way might be to put "/dev/null" resp. "NUL" on Windows to the ARGV
 begin
   STDIN.read_nonblock(1)
-rescue Errno::EAGAIN
+rescue Errno::EAGAIN, EOFError
   # The point of inspecting if STDIN and ARGV are empty is that we might
   # have an empty ARGF if anything passed and if so, it will wait for an interactive input which we don't want
   unless ARGV.empty?
