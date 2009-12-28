@@ -27,6 +27,6 @@ for file in $files; do
       git add "$file" # so the changes will be committed immediately
     fi
   else
-    printf "Skipping \"\e[36m$file\e[0m\" "
+    printf "Skipping \"\e[36m$file\e[0m\"\n"
   fi
 done
