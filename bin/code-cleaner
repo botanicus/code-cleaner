@@ -65,7 +65,8 @@ def apply_rules
 end
 
 if ARGV.delete("--try-apply-rules")
-  apply_rules ? exit : exit(1)
+  apply_rules
+  ARGV.empty? ? exit(1) : exit
 end
 
 if ARGV.delete("--apply-rules")
