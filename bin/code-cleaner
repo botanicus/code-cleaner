@@ -21,6 +21,8 @@
 
 require "find"
 
+$-i = true # Windows compatibility
+
 WHITELIST = Regexp.new(ENV["WHITELIST"] || '\.(rb|rake|nake|thor|task)$')
 BLACKLIST = Regexp.new(ENV["BLACKLIST"] || '/(vendor|gems)/')
 
