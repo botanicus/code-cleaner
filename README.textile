@@ -67,7 +67,7 @@ Here's an example how you can integrate code-cleaner to your tasks:
 begin
   load "code-cleaner.nake"
 rescue LoadError
-  warn "If you want to contribute to nake, you have to install code-cleaner gem and then run ./tasks.rb hooks:
+  warn "If you want to contribute to nake, you have to install code-cleaner gem and then run ./tasks.rb hooks:whitespace:install"
 end
 </pre>
 
