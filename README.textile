@@ -59,7 +59,9 @@ h2. Pre-commit hook
 
 The best way how you can ensure your sources are clean is to use pre-commit hook, if your SCM provides this function. Plus, if you are using git, just use @load "code-cleaner.rake"@ in your Rakefile and then run @rake hooks:whitespace:install@. There are also alternatives for "Nake":http://github.com/botanicus/nake (@code-cleaner.nake@) and "Thor":http://github.com/wycats/thor (@code-cleaner.thor@). Second way is to use @rake --rakefile /path/to/code-cleaner/tasks/code-cleaner.rake hooks:whitespace:install@ resp. @nake /path/to/code-cleaner/tasks/code-cleaner.nake hooks:whitespace:install@ directly.
 
-It might force you to remove your @.git/hooks/pre-commit@ if this file exist. If you haven't done any editation in this file, it's safe to do so and if you done some, then you will need to merge your changes manually.
+It might force you to remove your @.git/hooks/pre-commit@ if this file exist. If you haven't done any editation in this file, it's safe to do so and if you done some, then you will need to merge your changes manually. You can do it manually, or, if you are using Nake or Thor, just use @--force@ option.
+
+Here's an example how you can integrate code-cleaner to your tasks:
 
 <pre>
 begin
@@ -69,15 +71,4 @@ rescue LoadError
 end
 </pre>
 
-If you project run in bundled environment, make sure you have your @bin@ or @script@ directory in your @$PATH@ or change the pre-commit hook to point to the right path to the @code-cleaner@.
-
-<pre>
-load "code-cleaner.nake"
-Task["hooks:whitespace:install"].define do
-  content = File.readlines(".git/hooks/pre-commit")
-  content.insert(1, %{export PATH="script:$PATH"})
-  File.open(".git/hooks/pre-commit", "w") do |file|
-    file.puts(content)
-  end
-end
-</pre>
+Also, if you project run in bundled environment, make sure you have your @bin@ or @script@ directory in your @$PATH@ or change the pre-commit hook to point to the right path to the @code-cleaner@. If you are using Nake or Thor, just specify @--path=bin@ resp. @--path=script@ as an option for the @hooks:whitespace:install@ If you are using Rake, you will have to do it manually.
