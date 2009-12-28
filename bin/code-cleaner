@@ -58,7 +58,9 @@ if ARGV.include?("-h") or ARGV.include?("--help")
 end
 
 if ARGV.delete("--apply-rules")
+  original = ARGV.dup
   ARGV.delete_if { |file| File.file?(file) && ! permitted?(file) }
+  puts "~ Skipping #{original - ARGV}" unless ARGV == original
 end
 
 unless ARGV.grep(/^--encoding=(.+)$/).empty?
@@ -98,22 +100,32 @@ end
 # default exit status is 10 which signalize that we actually haven't changed anything
 status = 10
 
-while line = ARGF.gets
-  # I was trying to use ARGF.lineno.eql?(1), but it doesn't work. First problem
-  # was it didn't work with ARGF#each_line because IO#lineno count how many times
-  # IO#gets was called rather than how many \n the stream have. It isn't any
-  # serious problem, however when we have multiple files in ARGV, then the
-  # lineno isn't cleaned after the file in ARGF is switched.
-  # The trick with line.length == ARGF.pos is simple, IO#pos returns position
-  # of last character which was readed by gets or similar method, so if
-  # the position is same as is the line, then it has to be the first line.
-  if line.length == ARGF.pos && encoding && ! line.match(/^#.*coding/)
-    puts "# encoding: #{encoding}"
+# This is the only way how I was able to inspect if STDIN is empty. Magic, right?
+# NOTE: if this shows as a bad idea, another way might be to put "/dev/null" resp. "NUL" on Windows to the ARGV
+begin
+  STDIN.read_nonblock(1)
+rescue Errno::EAGAIN
+  # The point of inspecting if STDIN and ARGV are empty is that we might
+  # have an empty ARGF if anything passed and if so, it will wait for an interactive input which we don't want
+  unless ARGV.empty?
+    while line = ARGF.gets
+      # I was trying to use ARGF.lineno.eql?(1), but it doesn't work. First problem
+      # was it didn't work with ARGF#each_line because IO#lineno count how many times
+      # IO#gets was called rather than how many \n the stream have. It isn't any
+      # serious problem, however when we have multiple files in ARGV, then the
+      # lineno isn't cleaned after the file in ARGF is switched.
+      # The trick with line.length == ARGF.pos is simple, IO#pos returns position
+      # of last character which was readed by gets or similar method, so if
+      # the position is same as is the line, then it has to be the first line.
+      if line.length == ARGF.pos && encoding && ! line.match(/^#.*coding/)
+        puts "# encoding: #{encoding}"
+      end
+      # You might be wondering WTF is going on, I'm editing files, so I have to use File.open, do the modification on the original content and then save it. The point is we used -i switch which is good for in place editing
+       # flag that we actually changed the file
+      status = 0 if line.match(/^\s*\t\s*/) || ! line.match(/\n/)
+      puts line.gsub(/\t/, "  ").rstrip
+    end
   end
-  # You might be wondering WTF is going on, I'm editing files, so I have to use File.open, do the modification on the original content and then save it. The point is we used -i switch which is good for in place editing
-   # flag that we actually changed the file
-  status = 0 if line.match(/^\s*\t\s*/) || ! line.match(/\n/)
-  puts line.gsub(/\t/, "  ").rstrip
 end
 
 exit status
