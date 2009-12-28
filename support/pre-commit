@@ -12,6 +12,11 @@ echo "Entering pre-commit hook ..."
 # directory, but it isn't very good solution.
 files=$(git diff --staged --name-only 2> /dev/null || echo ".")
 
+function abort() {
+  printf "[\e[31mERROR\e[0m] $*\n"
+  exit 1
+}
+
 # NOTE: we are using printf rather than echo because printf should be
 # more portable, each echo implementation has quite different behaviour
 if which code-cleaner &> /dev/null; then
@@ -23,15 +28,19 @@ if which code-cleaner &> /dev/null; then
       # so we can be sure that the command just wasn't found
       if [ $? -eq 10 ]; then # code-cleaner exits with 0 if some changes were made
         printf "[\e[32mCLEAN\e[0m]\n"
-      else
+      elif [ $? -eq 1 ]; then # something goes wrong
+        printf "[\e[31mERROR\e[0m]\n"
+        code-cleaner "$file" --apply-rules
+      elif [ $? -eq 0 ] ; then
         printf "[\e[33mDONE\e[0m]\n"
         git add "$file" # so the changes will be committed immediately
+      else
+        abort "Unexpected exit status $?"
       fi
     else
       printf "Skipping \"\e[36m$file\e[0m\"\n"
     fi
   done
 else
-  printf "[\e[31mERROR\e[0m] You have to install code-cleaner first!\n"
-  exit 1
+  abort "You have to install code-cleaner first!"
 fi
