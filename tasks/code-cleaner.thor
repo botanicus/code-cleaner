@@ -5,9 +5,12 @@ require "fileutils"
 # thor hooks:whitespace:install
 # thor hooks:whitespace:install --force
 # thor hooks:whitespace:install --path=script
+# nake hooks:whitespace:install --encoding=utf-8
+# nake hooks:whitespace:install --whitelist=pattern
+# nake hooks:whitespace:install --blacklist=pattern
 module Hooks
   class Whitespace < Thor
-    method_options :force => :boolean, :path => :string
+    method_options :force => :boolean, :path => :string, :encoding => :string, :whitelist => :string, :blacklist => :string
     desc "install", "Install hook for automatically removing trailing whitespace"
     def install
       # --force

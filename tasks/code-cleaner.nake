@@ -7,13 +7,29 @@ require "nake/task"
 # nake hooks:whitespace:install
 # nake hooks:whitespace:install --force
 # nake hooks:whitespace:install --path=script
+# nake hooks:whitespace:install --encoding=utf-8
+# nake hooks:whitespace:install --whitelist=pattern
+# nake hooks:whitespace:install --blacklist=pattern
 Nake::Task.new("hooks:whitespace:install") do |task|
+  task.config.declare(:path, :encoding, :whitelist, :blacklist)
   task.description = "Install hook for automatically removing trailing whitespace"
   task.define do |options = Hash.new|
     # --force
     if File.exist?(".git/hooks/pre-commit") && options[:force]
       FileUtils.rm ".git/hooks/pre-commit"
     end
+
+    # --path=script
+    options[:path] = task.config[:path] unless options[:path]
+
+    # --encoding=utf-8
+    options[:encoding] = task.config[:encoding] unless options[:encoding]
+
+    # --whitelist=pattern
+    options[:whitelist] = task.config[:whitelist] unless options[:whitelist]
+
+    # --blacklist=pattern
+    options[:blacklist] = task.config[:blacklist] unless options[:blacklist]
 
     if File.exist?(".git/hooks/pre-commit")
       abort "You must remove .git/hooks/pre-commit first!"

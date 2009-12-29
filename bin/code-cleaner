@@ -132,8 +132,9 @@ rescue Errno::EAGAIN, EOFError
       end
       # You might be wondering WTF is going on, I'm editing files, so I have to use File.open, do the modification on the original content and then save it. The point is we used -i switch which is good for in place editing
        # flag that we actually changed the file
-      status = 0 if line.match(/^\s*\t\s*/) || ! line.match(/\n/)
-      puts line.gsub(/\t/, "  ").rstrip
+      normalized_line = line.gsub(/\t/, "  ").rstrip + "\n"
+      status = 0 if line != normalized_line
+      print normalized_line
     end
   end
 end
