@@ -47,6 +47,7 @@ if which code-cleaner &> /dev/null; then
         elif [ $exitstatus -eq 0 ] ; then
           printf "[\e[33mDONE\e[0m]\n"
           git add "$file" # so the changes will be committed immediately
+          sleep 0.1 # otherwise it might not work
         else
           abort "Unexpected exit status $?"
         fi
