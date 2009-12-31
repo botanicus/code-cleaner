@@ -25,6 +25,8 @@ function abort() {
   exit 1
 }
 
+sleep=false
+
 # NOTE: we are using printf rather than echo because printf should be
 # more portable, each echo implementation has quite different behaviour
 if which code-cleaner &> /dev/null; then
@@ -47,7 +49,7 @@ if which code-cleaner &> /dev/null; then
         elif [ $exitstatus -eq 0 ] ; then
           printf "[\e[33mDONE\e[0m]\n"
           git add "$file" # so the changes will be committed immediately
-          sleep 0.1 # otherwise it might not work
+          sleep=true # otherwise it might not work
         else
           abort "Unexpected exit status $?"
         fi
@@ -59,3 +61,5 @@ if which code-cleaner &> /dev/null; then
 else
   abort "You have to have code-cleaner installed and the code-cleaner script has to be in your \$PATH ($PATH)"
 fi
+
+$sleep && sleep 0.1 # otherwise it might not work
