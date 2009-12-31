@@ -24,7 +24,7 @@ require "find"
 
 $-i = "" # Windows compatibility
 
-WHITELIST = Regexp.new(ENV["WHITELIST"] || '\.(rb|rake|nake|thor|task)$')
+WHITELIST = Regexp.new(ENV["WHITELIST"] || '^(Rakefile|Thorfile|.+\.(rb|rake|nake|thor|task))$')
 BLACKLIST = Regexp.new(ENV["BLACKLIST"] || '/(vendor|gems)/')
 
 def permitted?(file)

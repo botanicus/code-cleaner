@@ -24,7 +24,7 @@ Default behaviour is to ignore everything from vendor and gems directories and f
 You can change this behaviour by setting environment variables @BLACKLIST@ and @WHITELIST@. What you pass to these variables will be treated as a regular expression. The default behaviour respond to @BLACKLIST='/(vendor|gems)/'@ and @WHITELIST='\.(rb|rake|task|thor)$'@. Here's an example how you can use it:
 
 <pre>
-WHITELIST=''\.(rb|rake|nake|thor|task)$'' BLACKLIST='/(vendor|gems)/' code-cleaner .
+WHITELIST=''^(Rakefile|Thorfile|.+\.(rb|rake|nake|thor|task))$'' BLACKLIST='/(vendor|gems)/' code-cleaner .
 </pre>
 
 Note that these rules aren't applied for explicit arguments, so if you run @code-cleaner README.textile@, your readme actually will be normalized. It's because blacklisting and whitelisting rules are applied just on directories, so if you run @code-cleaner .@, your readme will stay untouched. Because of this reason @code-cleaner .@ and @code-cleaner *@ will be different.
