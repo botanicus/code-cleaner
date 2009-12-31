@@ -129,6 +129,7 @@ rescue Errno::EAGAIN, EOFError
       # the position is same as is the line, then it has to be the first line.
       if line.length == ARGF.pos && encoding && ! line.match(/^#(.*coding|\!)/) # the \! should means shebang. TODO: if there is a shebang on the first line, check if encoding declaration is on the second line
         puts "# encoding: #{encoding}"
+        puts
       end
       # You might be wondering WTF is going on, I'm editing files, so I have to use File.open, do the modification on the original content and then save it. The point is we used -i switch which is good for in place editing
        # flag that we actually changed the file
