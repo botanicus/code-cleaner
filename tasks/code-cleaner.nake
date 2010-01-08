@@ -32,7 +32,7 @@ Nake::Task.new("hooks:whitespace:install") do |task|
     options[:blacklist] = task.config[:blacklist] unless options[:blacklist]
 
     if File.exist?(".git/hooks/pre-commit")
-      abort "You must remove .git/hooks/pre-commit first!"
+      abort "The hook .git/hooks/pre-commit already exists. Run this task with --force if you want to overwrite it."
     else
       begin
         puts "Installing .git/hooks/pre-commit ..."
