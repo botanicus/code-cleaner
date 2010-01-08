@@ -3,7 +3,7 @@
 
 Gem::Specification.new do |s|
   s.name = "code-cleaner"
-  s.version = "0.7"
+  s.version = "0.8"
   s.authors = ["Jakub Šťastný aka Botanicus"]
   s.homepage = "http://github.com/botanicus/code-cleaner"
   s.summary = "Remove trailing whitespace, append missing \\n and replace tabs by two spaces"
