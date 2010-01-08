@@ -72,3 +72,16 @@ end
 </pre>
 
 Also, if you project run in bundled environment, make sure you have your @bin@ or @script@ directory in your @$PATH@ or change the pre-commit hook to point to the right path to the @code-cleaner@. If you are using Nake or Thor, just specify @--path=bin@ resp. @--path=script@ as an option for the @hooks:whitespace:install@ If you are using Rake, you will have to do it manually.
+
+
+--encoding=utf-8
+--whitelist=pattern & --blacklist=pattern
+
+<pre>
+Nake::Task["hooks:whitespace:install"].tap do |task|
+  task.config[:path] = "bin"
+  task.config[:encoding] = "utf-8"
+  task.config[:whitelist] = '(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'
+  #task.config[:blacklist]
+end
+</pre>
