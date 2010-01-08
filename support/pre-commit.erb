@@ -59,7 +59,7 @@ if which code-cleaner &> /dev/null; then
   done
 
   # otherwise it doesn't work time to time
-  $sleep && sleep 0.5
+  $sleep && sleep 0.8
   for file in $files; do
     test -f "$file" && git add "$file" # so the changes will be committed immediately
   done
