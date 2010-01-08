@@ -48,7 +48,6 @@ if which code-cleaner &> /dev/null; then
           exit 1
         elif [ $exitstatus -eq 0 ] ; then
           printf "[\e[33mDONE\e[0m]\n"
-          git add "$file" # so the changes will be committed immediately
           sleep=true # otherwise it might not work
         else
           abort "Unexpected exit status $?"
@@ -58,9 +57,14 @@ if which code-cleaner &> /dev/null; then
       fi
     fi
   done
+
+  # otherwise it doesn't work time to time
+  $sleep && sleep 0.5
+  for file in $files; do
+    test -f "$file" && git add "$file" # so the changes will be committed immediately
+  done
 else
   abort "You have to have code-cleaner installed and the code-cleaner script has to be in your \$PATH ($PATH)"
 fi
 
-$sleep && sleep 0.1 # otherwise it might not work
 exit 0
