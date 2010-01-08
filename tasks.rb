@@ -9,5 +9,5 @@ end
 Nake::Task["hooks:whitespace:install"].tap do |task|
   task.config[:path] = "bin"
   task.config[:encoding] = "utf-8"
-  task.config[:whitelist] = '(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'
+  task.config[:whitelist] = '(bin/[^/]+|.+\.(rb|rake|nake|thor|task|gemspec))$'
 end
