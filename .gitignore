@@ -1,3 +1,10 @@
-*.gem
-pkg
-tmp
+# we can't use just *.gem because
+/*.gem
+
+.DS_Store
+.cache
+.yardoc
+
+script/*
+gems/*
+!gems/cache
