@@ -24,7 +24,7 @@ require "find"
 
 $-i = "" # Windows compatibility
 
-WHITELIST = Regexp.new(ENV["WHITELIST"] || '^(Rakefile|Thorfile|.+\.(rb|rake|nake|thor|task|gemspec))$')
+WHITELIST = Regexp.new(ENV["WHITELIST"] || '^(Rakefile|Thorfile|Gemfile|.+\.(rb|rake|nake|thor|task|gemspec))$')
 BLACKLIST = Regexp.new(ENV["BLACKLIST"] || '/(vendor|gems)/')
 
 def permitted?(file)
@@ -52,10 +52,10 @@ if ARGV.include?("-h") or ARGV.include?("--help")
         "\n"\
         "[\e[32mTricks\e[0m]\n"\
         "If you want to add files from your bin or script directory into \n"\
-        "whitelist, use WHITELIST='(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'"
+        "whitelist, use WHITELIST='(^bin/[^/]+|Rakefile|Thorfile|Gemfile$)|(^.+\.(rb|rake|nake|thor|task|gemspec)$)'"
         "\n"\
         "[\e[32mExamples\e[0m]\n"\
-        "WHITELIST='(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'"
+        "WHITELIST='(^bin/[^/]+|Rakefile|Thorfile|Gemfile$)|(^.+\.(rb|rake|nake|thor|task|gemspec)$)'"
 end
 
 def apply_rules

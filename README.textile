@@ -21,17 +21,17 @@ Of course you don't want to remove spaces from other files like PDF documents, i
 
 Default behaviour is to ignore everything from vendor and gems directories and from other directories just files ending with .rb, .rake, .task and .thor are normalized.
 
-You can change this behaviour by setting environment variables @BLACKLIST@ and @WHITELIST@. What you pass to these variables will be treated as a regular expression. The default behaviour respond to @BLACKLIST='/(vendor|gems)/'@ and @WHITELIST='\.(rb|rake|task|thor)$'@. Here's an example how you can use it:
+You can change this behaviour by setting environment variables @BLACKLIST@ and @WHITELIST@. What you pass to these variables will be treated as a regular expression. The default behaviour respond to @BLACKLIST='/(vendor|gems)/'@ and @WHITELIST='(^bin/[^/]+|Rakefile|Thorfile|Gemfile$)|(^.+\.(rb|rake|nake|thor|task|gemspec)$)'@. Here's an example how you can use it:
 
 <pre>
-WHITELIST=''^(Rakefile|Thorfile|.+\.(rb|rake|nake|thor|task|gemspec))$'' BLACKLIST='/(vendor|gems)/' code-cleaner .
+WHITELIST=''^(Rakefile|Thorfile|Gemfile|.+\.(rb|rake|nake|thor|task|gemspec))$'' BLACKLIST='/(vendor|gems)/' code-cleaner .
 </pre>
 
 Note that these rules aren't applied for explicit arguments, so if you run @code-cleaner README.textile@, your readme actually will be normalized. It's because blacklisting and whitelisting rules are applied just on directories, so if you run @code-cleaner .@, your readme will stay untouched. Because of this reason @code-cleaner .@ and @code-cleaner *@ will be different.
 
 If you want to force blacklisting resp. whitelisting even for explicitly specified files, use @--apply-rules@ switch. If you want just try it, use @--try-apply-rules@ which will tell you which files will be skipped and exit without any editing. If some files left in ARGV, the exit status will be 0, otherwise it will be 1.
 
-In your Ruby projects, you might add all files in your @bin@ and @script@ directories into whitelist: @WHITELIST='(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'@
+In your Ruby projects, you might add all files in your @bin@ and @script@ directories into whitelist: @WHITELIST='(^bin/[^/]+|Rakefile|Thorfile|Gemfile$)|(^.+\.(rb|rake|nake|thor|task|gemspec)$)'@
 
 h2. Exit statuses
 
@@ -81,7 +81,7 @@ Also, if you project run in bundled environment, make sure you have your @bin@ o
 Nake::Task["hooks:whitespace:install"].tap do |task|
   task.config[:path] = "bin"
   task.config[:encoding] = "utf-8"
-  task.config[:whitelist] = '(bin/[^/]+|.+\.(rb|rake|nake|thor|task))$'
+  task.config[:whitelist] = '(^bin/[^/]+|Rakefile|Thorfile|Gemfile$)|(^.+\.(rb|rake|nake|thor|task|gemspec)$)'
   #task.config[:blacklist]
 end
 </pre>
