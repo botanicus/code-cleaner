@@ -5,7 +5,7 @@ require "base64"
 
 Gem::Specification.new do |s|
   s.name = "code-cleaner"
-  s.version = "0.8.1"
+  s.version = "0.8.2"
   s.authors = ["Jakub Šťastný aka Botanicus"]
   s.homepage = "http://github.com/botanicus/code-cleaner"
   s.summary = "Remove trailing whitespace, append missing \\n and replace tabs by two spaces"
