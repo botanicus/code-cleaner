@@ -10,7 +10,8 @@ task "hooks:whitespace:install" do
   else
     begin
       puts "Installing .git/hooks/pre-commit ..."
-      source = File.join(File.dirname(__FILE__), "..", "support", "pre-commit.erb")
+      source  = File.join(File.dirname(__FILE__), "..", "support", "pre-commit.erb")
+      options = Hash.new
       File.open(".git/hooks/pre-commit", "w") do |file|
         file.puts(ERB.new(File.read(source)).result)
       end
